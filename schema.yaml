@@ -1,0 +1,213 @@
+## Copyright (c) 2022, Oracle and/or its affiliates.
+## All rights reserved. The Universal Permissive License (UPL), Version 1.0 as shown at http://oss.oracle.com/licenses/upl
+
+title: "Deployment OCI IOT Wearable Application"
+stackDescription: "Deployment OCI IOT Wearable Application"
+description: "Deployment on OCI IOT Wearable Application using OCI Resources."
+schemaVersion: 0.0.0
+version: "20221013"
+locale: "en"
+
+#################
+# Variable Groups
+#################
+variableGroups:
+- title: "General Configuration"
+  visible: false
+  variables:
+  - tenancy_ocid
+  - compartment_ocid
+  - user_ocid
+  - fingerprint
+  - private_key_path
+  - region
+  - app_name
+  - release
+  - gateway_displayname
+  - gateway_visibility
+  - path_prefix
+  - VCN-CIDR
+  - Public-Subnet-CIDR
+  - Private-Subnet-CIDR
+  - availability_domain_name
+  - mysql_instance_compartment_name
+  - mysql_network_compartment_name
+  - mysql_instance_compartment_ocid
+  - mysql_network_compartment_ocid
+  - mysql_db_system_backup_policy_is_enabled
+  - mysql_db_system_backup_policy_retention_in_days
+  - mysql_db_system_backup_policy_window_start_time
+  - mysql_db_system_data_storage_size_in_gb
+  - mysql_db_system_description
+  - mysql_db_system_freeform_tags
+  - mysql_db_system_is_highly_available
+  - mysql_db_system_port
+  - mysql_db_system_port_x
+  - mysql_shape_name
+  - mysql_heatwave_enabled
+  - mysql_heatwave_cluster_size
+  - mysql_heatwave_shape
+  - bucket_access_type
+  - bucket_auto_tiering
+  - bucket_storage_tier
+  - bucket_versioning
+  - vault_vault_type
+  - vault_key_shape_algorithm
+  - key_key_shape_length
+  - vault_key_protection_mode
+  - vault_app_env_user
+  - stream_partition_count
+  - stream_retention_in_hours
+  - auth_profile
+  - email_domain_name
+  - sender_email_address
+  - container_repository_is_public
+  - deploy_artifact_argument_substitution_mode
+  - project_logging_config_retention_period_in_days
+  - project_description
+  - repository_name
+  - repository_default_branch
+  - repository_description
+  - git_repo
+  - git_repo_name
+  - git_branch
+  - buildparam_baseimage_notificationservice
+  - repository_repository_type
+  - build_pipeline_stage_build_pipeline_stage_type
+  - build_pipeline_stage_build_source_collection_items_connection_type
+  - build_pipeline_stage_build_source_collection_items_branch
+  - build_pipeline_stage_build_source_collection_items_name
+  - notification_buildspec
+  - tcpserver_buildspec
+  - adminapi_buildspec
+  - adminapi_authorizer_buildspec
+  - build_pipeline_stage_display_name
+  - build_pipeline_stage_image
+  - build_pipeline_stage_wait_criteria_wait_duration
+  - build_pipeline_stage_wait_criteria_wait_type
+  - build_pipeline_stage_stage_execution_timeout_in_seconds
+  - build_pipeline_stage_deliver_artifact_stage_type
+  - deliver_artifact_stage_display_name
+  - build_pipeline_stage_deploy_stage_type
+  - deploy_stage_display_name
+  - build_pipeline_stage_is_pass_all_parameters_enabled
+  - oke_deploy_rollback_policy
+  - oke_namespace
+  - oke_externalsecret_operator_url
+  - metric_server_version
+  - smtp_user_ocid
+
+- title: "Required Configuration"
+  visible: true  
+  variables:
+    - oci_user_name
+    - oci_user_authtoken
+    - show_advanced
+    - mysql_db_system_admin_username
+    - mysql_db_system_admin_password
+    - oci_queue_ocid
+    - smtp_user_ocid
+
+- title: "Encryption Settings"
+  description: Policy setting for the stack deployment
+  visible: true
+  variables:
+    - use_encryption_from_oci_vault
+    - create_new_encryption_key
+    - existent_encryption_key_id
+    - create_vault_policies_for_group
+    - user_admin_group_for_vault_policy
+- title: "OKE Cluster Configuration"
+  visible: true
+  variables:
+    - create_new_oke_cluster
+    - existent_oke_cluster_id
+    - create_new_compartment_for_oke
+    - oke_compartment_description
+    - cluster_options_add_ons_is_kubernetes_dashboard_enabled
+    - cluster_options_admission_controller_options_is_pod_security_policy_enabled
+    - cluster_workers_visibility
+    - cluster_endpoint_visibility
+    - k8s_version
+    - ingress_version
+
+- title: "OKE Worker Nodes Configuration"
+  visible: true
+  variables:
+    - generate_public_ssh_key
+    - public_ssh_key
+    - num_pool_workers
+    - node_pool_name
+    - node_pool_shape
+    - node_pool_node_shape_config_ocpus
+    - node_pool_node_shape_config_memory_in_gbs
+    - image_operating_system
+    - image_operating_system_version
+    - create_dynamic_group_for_nodes_in_compartment
+    - existent_dynamic_group_for_nodes_in_compartment
+    - create_compartment_policies
+    - create_tenancy_policies
+
+
+######################
+# Variable Definitions
+######################
+
+variables:
+
+  # Required
+
+  oci_user_name:
+    type: string
+    required: true
+    visibile: true
+    title: "OCI username"
+    description: "For a federated user (single sign-on with an identity provider), enter the username in the following format: TenancyName/Federation/UserName. For example, if you use OCI's identity provider, your login would be, Acme/oracleidentitycloudservice/alice.jones@acme.com. If you are using OCI's direct sign-in, enter the username in the following format: TenancyName/YourUserName. For example, Acme/alice_jones. Your password is the auth token you created previously."
+
+  oci_user_authtoken:
+    type: password
+    required: true
+    visibile: true
+    title: "OCI user auth token"
+    description: "You can get the auth token from your Profile menu -> click User Settings -> On left side  click *Auth Tokens -> Generate Token"
+
+  smtp_user_ocid:
+    type: string
+    required: true
+    visibile: true
+    title: "OCI user auth token"
+    description: "OCID of the SMTP USer"
+
+  mysql_db_system_admin_username:
+    type: string
+    required: true
+    visibile: true
+    title: "DB Admin username"
+    description: "Admin username for DB MySQL"
+
+  mysql_db_system_admin_password:
+    type: password
+    required: true
+    visibile: true
+    title: "DB Admin password"
+    description: "Admin password for DB MySQL"
+
+  oci_queue_ocid:
+    type: string
+    required: true
+    visibile: true
+    title: "OCID of OCI Queue"
+    description: "Queue service is an LA offer ,contact your product manager"
+
+  show_advanced:
+    type: boolean
+    title: "Show advanced options?"
+    description: "Shows advanced options."
+    visible: true
+    default: false
+
+  compartment_id:
+    type: oci:identity:compartment:id
+    title: "Compartment"
+    description: "The compartment in which to create resources"
+    required: true
