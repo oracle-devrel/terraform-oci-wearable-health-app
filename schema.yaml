@@ -4,7 +4,7 @@
 title: "Deployment OCI IOT Wearable Application"
 stackDescription: "Deployment OCI IOT Wearable Application"
 description: "Deployment on OCI IOT Wearable Application using OCI Resources."
-schemaVersion: 1.1.0
+schemaVersion: 2.0.0
 version: "20221013"
 locale: "en"
 
@@ -25,6 +25,17 @@ variableGroups:
       - network_cidrs
       - node_pool_boot_volume_size_in_gbs
       - release
+      - dataflow_arguments
+      - mysql_db_system_freeform_tags
+      - mysql_instance_compartment_name
+      - mysql_instance_compartment_ocid
+      - mysql_network_compartment_name
+      - mysql_network_compartment_ocid
+      - repository_description
+      - repository_repository_type
+      - vault_key_protection_mode
+      - vault_key_shape_algorithm
+      - vault_vault_type
 
   - title: "Required Configuration"
     visible: true
@@ -53,6 +64,8 @@ variableGroups:
       - dataflow_buildspec
       - dbsetup_buildspec
       - build_pipeline_stage_image
+      - oke_namespace
+      - vault_app_env_user
 
   - title: "External Configurations"
     visible: true
@@ -226,6 +239,18 @@ variables:
     type: string
     title: "Pre fix for OCI Resources"
     required: true
+
+  oke_namespace:
+    type: string
+    title: "Application namespace"
+    required: true
+    visible: true
+
+  vault_app_env_user:
+    type: string
+    title: "Application env user"
+    required: true
+    visible: true
 
   container_repository_is_public:
     type: boolean
