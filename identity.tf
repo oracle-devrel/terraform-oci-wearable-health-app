@@ -54,6 +54,7 @@ resource "oci_identity_policy" "policy" {
     "Allow dynamic-group ${oci_identity_dynamic_group.dg_devops.name} to manage virtual-network-family in compartment id ${var.compartment_ocid}",
     "Allow dynamic-group ${oci_identity_dynamic_group.dg_devops.name} to use cabundles in compartment id ${var.compartment_ocid}",
     "Allow dynamic-group ${oci_identity_dynamic_group.dg_devops.name} to use network-security-groups in compartment id ${var.compartment_ocid}",
+    "Allow dynamic-group ${oci_identity_dynamic_group.dg_devops.name} to manage object-family in compartment id ${var.compartment_ocid}",
     "Allow dynamic-group ${oci_identity_dynamic_group.dg_dataflow.name} to use all-resources in compartment id ${var.compartment_ocid}"
      ]
 }
