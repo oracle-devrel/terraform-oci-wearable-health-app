@@ -4,7 +4,7 @@
 title: "Deployment OCI IOT Wearable Application"
 stackDescription: "Deployment OCI IOT Wearable Application"
 description: "Deployment on OCI IOT Wearable Application using OCI Resources."
-schemaVersion: 2.0.0
+schemaVersion: 1.1.0
 version: "20221013"
 locale: "en"
 
