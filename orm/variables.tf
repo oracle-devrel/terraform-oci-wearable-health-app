@@ -364,6 +364,9 @@ variable "build_pipeline_stage_build_source_collection_items_branch" {
 variable "build_pipeline_stage_build_source_collection_items_name" {
   default = "source"
 }
+variable "webui_buildspec" {
+  default = "/web-app/build_spec.yaml"
+}
 variable "notification_buildspec" {
   default = "/notification-service/build_spec.yaml"
 }

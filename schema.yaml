@@ -691,7 +691,8 @@ variables:
     type: enum
     enum:
       - "NoPublicAccess"
-      - "PublicAccess"
+      - "ObjectRead"
+      - "ObjectReadWithoutList"
 
     title: "Object storage visibility "
     required: true

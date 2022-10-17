@@ -372,6 +372,9 @@ variable "notification_buildspec" {
 variable "tcpserver_buildspec" {
   default = "/tcp-server/build_spec.yaml"
 }
+variable "webui_buildspec" {
+  default = "/web-app/build_spec.yaml"
+}
 variable "adminapi_buildspec" {
   default = "/admin-api/build_spec.yaml"
 }

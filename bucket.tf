@@ -27,4 +27,16 @@ resource "oci_objectstorage_bucket" "bucket_dataflow_logs" {
   timeouts {}
 }
 
+resource "oci_objectstorage_bucket" "bucket_webui" {
+  access_type           = "ObjectRead"
+  auto_tiering          = var.bucket_auto_tiering
+  compartment_id        = var.compartment_ocid
+  name                  = "${var.app_name}_webui"
+  namespace             = data.oci_objectstorage_namespace.ns.namespace
+  object_events_enabled = false
+  storage_tier          = var.bucket_storage_tier
+  versioning            = var.bucket_versioning
+  defined_tags   = { "${oci_identity_tag_namespace.ArchitectureCenterTagNamespace.name}.${oci_identity_tag.ArchitectureCenterTag.name}" = var.release }
+  timeouts {}
+}
 

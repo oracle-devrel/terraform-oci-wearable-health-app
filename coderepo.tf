@@ -89,6 +89,7 @@ resource "null_resource" "update_placeholders" {
       DB_PASSWORD_VALUE = "$${DB_PASSWORD_VALUE}"
       OCI_PRIMARY_SOURCE_DIR = "$${OCI_PRIMARY_SOURCE_DIR}"
       MYSQL_RPM_VERSION = "$${MYSQL_RPM_VERSION}"
+      OCI_BUILD_RUN_ID = "$${OCI_BUILD_RUN_ID}"
       TCPSERVER_IMAGE_REPO_URL = "${local.ocir_docker_repository}/${local.ocir_namespace}/${oci_artifacts_container_repository.container_repository_tcpserver.display_name}"
       VAULT_OCID = oci_kms_vault.vault.id
       REGION_ID = var.region
@@ -116,7 +117,6 @@ resource "null_resource" "update_placeholders" {
 
   }
 }
-
 
 resource "null_resource" "copyfiles" {
 

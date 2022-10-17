@@ -132,3 +132,28 @@ resource "oci_devops_build_run" "dataflow_buildrun" {
   }
 
 }
+
+resource "oci_devops_build_run" "webui_buildrun" {
+  provisioner "local-exec" {
+    command = "sleep 600"
+  }
+  depends_on = [oci_identity_policy.policy,
+    oci_devops_build_run.adminapi_authorizer_buildrun,
+    oci_devops_build_run.adminapi_buildrun,
+    oci_devops_build_run.dataflow_buildrun,
+    oci_devops_build_run.dbsetup_buildrun,
+    oci_devops_build_run.notification_buildrun,
+    oci_devops_build_run.tcpserver_buildrun,
+    oci_objectstorage_bucket.bucket_webui
+  ]
+
+  #Required
+  build_pipeline_id = oci_devops_build_pipeline.dataflow.id
+
+  #Optional
+  display_name = "dataflow_build_run_${random_id.tag.hex}"
+  provisioner "local-exec" {
+    command = "sleep 600"
+  }
+
+}
