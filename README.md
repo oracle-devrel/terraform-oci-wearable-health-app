@@ -105,9 +105,14 @@ Deploy:
 
 
 ## Destroy the Deployment
-Delete all the artifacts with in the `OCI Artifact repository` then follow terraform command and destroy.
+- Delete all the artifacts with in the `OCI Artifact repository` then follow terraform command and destroy.
+- Delete any additional resources (loadbalancers,PVs,Secrets,Private Endpoints .. ) created using the terraform provisioned components using console.
+- Vault will change  in to `pending deletion` state after the destroy execution.
 
-    terraform destroy
+```java
+terraform destroy
+```
+    
 
 ## Contributing
 This project is open source.  Please submit your contributions by forking this repository and submitting a pull request!  Oracle appreciates any contributions that are made by the open source community.

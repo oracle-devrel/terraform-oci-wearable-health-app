@@ -86,14 +86,12 @@ resource "null_resource" "update_placeholders" {
       SMTP_PASSWORD_OCID = "$${SMTP_PASSWORD_OCID}"
       EMAIL_HOST = "$${EMAIL_HOST}"
       EMAIL_FROM_ADDRESS = "$${EMAIL_FROM_ADDRESS}"
-      PATH_VALUE = "$${PATH}"
+      DB_PASSWORD_VALUE = "$${DB_PASSWORD_VALUE}"
+      OCI_PRIMARY_SOURCE_DIR = "$${OCI_PRIMARY_SOURCE_DIR}"
+      MYSQL_RPM_VERSION = "$${MYSQL_RPM_VERSION}"
       TCPSERVER_IMAGE_REPO_URL = "${local.ocir_docker_repository}/${local.ocir_namespace}/${oci_artifacts_container_repository.container_repository_tcpserver.display_name}"
       VAULT_OCID = oci_kms_vault.vault.id
       REGION_ID = var.region
-      ARTIFACT_REPO_OCID = oci_artifacts_repository.test_repository.id
-      ARTIFACT_NAME = var.artifact_name
-      ARTIFACT_VERSION = var.artifact_version
-      DB_PASSWORD = var.mysql_db_system_admin_password
       DB_USERNAME = var.mysql_db_system_admin_username
       DB_PORT = var.mysql_db_system_port
       DB_SERVER = oci_mysql_mysql_db_system.mysql_db.ip_address
@@ -113,6 +111,7 @@ resource "null_resource" "update_placeholders" {
       cp ${path.module}/instance_bootstrap ${path.module}/instance_bootstrap_origin
       cat ${path.module}/instance_bootstrap |envsubst >${path.module}/instance_bootstrap.tmp
       mv ${path.module}/instance_bootstrap.tmp ${path.module}/instance_bootstrap
+      cat ${path.module}/manifest/dbsetup_build_spec.yaml |envsubst >${path.module}/${var.git_repo_name}/DB-Setup/build_spec.yaml
     EOT
 
   }
@@ -138,12 +137,12 @@ resource "null_resource" "pushcode" {
       cd ./${oci_devops_repository.test_repository.name}
       git_global_username=`git config --global user.name`
       git_global_mail=`git config --global user.email`
-      git config --global user.email test@example.com
-      git config --global user.name ${var.oci_user_name}
+      git config user.email test@example.com
+      git config user.name ${var.oci_user_name}
       git add .; git commit -m 'added latest files'
       git push origin ${var.repository_default_branch}
-      git config --global user.email ""
-      git config --global user.name ""
+      git config user.email ""
+      git config user.name ""
 
     EOT
 

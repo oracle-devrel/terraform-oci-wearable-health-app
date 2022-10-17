@@ -18,7 +18,7 @@ variable "oci_user_authtoken" {}
 
 variable "release" {
   description = "Reference Architecture Release (OCI Architecture Center)"
-  default     = "0.0"
+  default     = "1.1"
 }
 
 
@@ -51,6 +51,19 @@ variable "Public-Subnet-CIDR" {
 variable "Private-Subnet-CIDR" {
   default = "10.100.10.0/24"
 }
+
+variable "application_network_cidrs" {
+  type = map(string)
+
+  default = {
+    VCN-CIDR                      = "10.100.0.0/16"
+    PRIVATE-SUBNET-CIDR           = "10.100.10.0/24"
+    PUBLIC-SUBNET-CIDR            = "10.100.0.0/24"
+    ALL-CIDR                      = "0.0.0.0/0"
+
+  }
+}
+
 
 /********** VCN Variables **********/
 
@@ -200,6 +213,36 @@ variable "vault_app_env_user" {
 
 /********** Vault Variables **********/
 
+/********** Compute Variables **********/
+variable "compute_name" {
+  default = "bastion hosts"
+}
+variable "instance_shape" {
+  description = "Instance Shape"
+  default     = "VM.Standard.E4.Flex"
+}
+variable "instance_shape_ocpus" {
+  default = 1
+}
+
+variable "instance_shape_memory_in_gbs" {
+  default = 1
+}
+
+variable "instance_os" {
+  description = "Operating system for compute instances"
+  default     = "Oracle Linux"
+}
+
+variable "linux_os_version" {
+  description = "Operating system version for all Linux instances"
+  default     = "8"
+}
+variable "ssh_public_key" {
+  default = "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQCbm5o7Y0AsLJdSWhsWRiDiNQam/2MB5L5NX+glKna9UGl4yQ19jSlJgXalcpuKQ/FrCrlW6PQkDVl0U5FeKqRigMAgVj4nUlWASvERsIXXtjpWJ7f9Fc1THCwi0GPDIvdM9BQwWcSBTolsN/M/GjFMO7u4t6a7iA/LeEKxWPlJdGC+tKosZO1KJFykva4VKTdOmXNySXHEjltH9SsdC9Kdz/X4R7YfwUA2h2TPmJEX0ZIueu2SeaBj6A1YCAP1k/RqPX3QhPdGYQp99mSyIGkvNt4lKewRsGyC3JnaG4o7vyY87NXWAnvNAxUjILEFt17J3k6y8nEIIq5BiOVEEnHF rahul_m_r@0a81408776aa"
+}
+/********** Compute Variables **********/
+
 /********** Stream Variables **********/
 variable "stream_partition_count" {
   default = 1 #10
@@ -234,6 +277,63 @@ variable "smtp_user_ocid" {
 }
 /********** SMTP Variables **********/
 
+/********** Artifact repo Variables **********/
+variable "artifact_name" {
+  default = "script.sql"
+}
+variable "artifact_version" {
+  default = "0.0.0"
+}
+/********** Artifact repo Variables **********/
+/********** Dataflow  Variables **********/
+variable "dataflow_arguments" {
+  default = []
+}
+variable "dataflow_mainclass" {
+  default = "com.oracle.cloud.wearable.streaming.analytics.HealthEventAnalysis"
+}
+variable "dataflow_authmode" {
+  default = "resource_principal"
+}
+
+variable "dataflow_maxExecutors" {
+  default = "4"
+}
+variable "dataflow_minExecutors" {
+  default = "2"
+}
+variable "dataflow_driver_shape" {
+  default = "VM.Standard.E4.Flex"
+}
+variable "dataflow_executor_shape" {
+  default = "VM.Standard.E4.Flex"
+}
+variable "dataflow_num_executors" {
+  default = 2
+}
+variable "dataflow_spark_version" {
+  default = "3.2.1"
+}
+variable "dataflow_type" {
+  default = "STREAMING"
+}
+
+variable "dataflow_driver_shape_config_memory_in_gbs" {
+  default = 64
+}
+variable "dataflow_driver_shape_config_ocpus" {
+  default = 8
+}
+
+variable "dataflow_executor_shape_config_memory_in_gbs" {
+  default = 32
+}
+variable "dataflow_executor_shape_config_ocpus" {
+  default = 4
+}
+
+/********** Dataflow  Variables **********/
+
 /********** Devops Variables **********/
 variable "container_repository_is_public" {
   default = true
@@ -264,7 +364,7 @@ variable "repository_description" {
 }
 
 variable "git_branch" {
-  default = "main"
+  default = "release/1.0.0"
 }
 
 variable "git_repo" {
@@ -272,7 +372,7 @@ variable "git_repo" {
 }
 
 variable "git_repo_name" {
-  default = "oci-wearable-demo"
+  default = "oci-wearable-health-app" #It must be same as that of actual github reponame.
 }
 
 variable "buildparam_baseimage_notificationservice" {
@@ -316,6 +416,14 @@ variable "adminapi_buildspec" {
 
 variable "adminapi_authorizer_buildspec" {
   default = "/admin-api-authorizer/build_spec.yaml"
+}
+
+variable "dataflow_buildspec" {
+  default = "/healtheventanalysis/build_spec.yaml"
+}
+
+variable "dbsetup_buildspec" {
+  default = "/DB-Setup/build_spec.yaml"
 }
 variable "build_pipeline_stage_display_name" {
   default = "Managed Build of Application"
@@ -368,3 +476,4 @@ variable "oke_externalsecret_operator_url" {
 variable "metric_server_version" {
   default = "v0.6.1"
 }
+

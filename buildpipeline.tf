@@ -8,6 +8,7 @@ resource "oci_devops_build_pipeline" "build_pipeline_notification" {
 
   description  = "Build pipeline for notification service"
   display_name = "${var.app_name}_notification_buildpipeline"
+  defined_tags    = { "${oci_identity_tag_namespace.ArchitectureCenterTagNamespace.name}.${oci_identity_tag.ArchitectureCenterTag.name}" = var.release }
   build_pipeline_parameters {
     items {
       name          = "BASE_CONTAINER_IMAGE"
@@ -34,6 +35,7 @@ resource "oci_devops_build_pipeline" "build_pipeline_adminapi" {
 
   description  = "Build pipeline for adminapi service"
   display_name = "${var.app_name}_adminapi_buildpipeline"
+  defined_tags    = { "${oci_identity_tag_namespace.ArchitectureCenterTagNamespace.name}.${oci_identity_tag.ArchitectureCenterTag.name}" = var.release }
 }
 
 resource "oci_devops_build_pipeline" "build_pipeline_tcpserver" {
@@ -43,6 +45,7 @@ resource "oci_devops_build_pipeline" "build_pipeline_tcpserver" {
 
   description  = "Build pipeline for tcpserver service"
   display_name = "${var.app_name}_tcpserver_buildpipeline"
+  defined_tags    = { "${oci_identity_tag_namespace.ArchitectureCenterTagNamespace.name}.${oci_identity_tag.ArchitectureCenterTag.name}" = var.release }
   build_pipeline_parameters {
     items {
       name          = "BASE_CONTAINER_IMAGE"
@@ -59,6 +62,7 @@ resource "oci_devops_build_pipeline" "dataflow" {
 
   description  = "Build pipeline for tcpserver service"
   display_name = "${var.app_name}_dataflow_buildpipeline"
+  defined_tags    = { "${oci_identity_tag_namespace.ArchitectureCenterTagNamespace.name}.${oci_identity_tag.ArchitectureCenterTag.name}" = var.release }
   build_pipeline_parameters {
     items {
       name          = "NAMESPACE_NAME"
@@ -69,6 +73,19 @@ resource "oci_devops_build_pipeline" "dataflow" {
       name          = "BUCKET_NAME"
       default_value = oci_objectstorage_bucket.bucket_dataflow_configs.name
       description   = "Bucket name"
+
   }
 }
 }
+
+resource "oci_devops_build_pipeline" "db_setup" {
+
+  #Required
+  project_id = oci_devops_project.test_project.id
+
+  description  = "Build pipeline for dbsetup service"
+  display_name = "${var.app_name}_dbsetup_buildpipeline"
+  defined_tags    = { "${oci_identity_tag_namespace.ArchitectureCenterTagNamespace.name}.${oci_identity_tag.ArchitectureCenterTag.name}" = var.release }
+
+}
+

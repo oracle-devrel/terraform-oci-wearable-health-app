@@ -12,25 +12,70 @@ resource "oci_core_virtual_network" "vcn" {
 
 # Create internet gateway to allow public internet traffic
 
-resource "oci_core_internet_gateway" "ig" {
+resource "oci_core_internet_gateway" "application_internet_gateway" {
   compartment_id = var.compartment_ocid
-  display_name   = "internet-gateway"
+  display_name   = "${var.app_name}_app_internet_gateway"
   vcn_id         = oci_core_virtual_network.vcn.id
   defined_tags   = { "${oci_identity_tag_namespace.ArchitectureCenterTagNamespace.name}.${oci_identity_tag.ArchitectureCenterTag.name}" = var.release }
 }
 
-# Create route table to connect vcn to internet gateway
+# Create service gateway for OCI service access
+resource "oci_core_service_gateway" "application_service_gateway" {
+  compartment_id = var.compartment_ocid
+  display_name   = "${var.app_name}_app_servicegateway"
+  vcn_id         = oci_core_virtual_network.vcn.id
+  services {
+    service_id = lookup(data.oci_core_services.all_services.services[0], "id")
+  }
+  defined_tags = { "${oci_identity_tag_namespace.ArchitectureCenterTagNamespace.name}.${oci_identity_tag.ArchitectureCenterTag.name}" = var.release }
 
-resource "oci_core_route_table" "rt" {
+}
+
+resource "oci_core_nat_gateway" "application_nat_gateway" {
+  compartment_id = var.compartment_ocid
+  display_name   = "${var.app_name}_app_natgateway"
+  vcn_id         = oci_core_virtual_network.vcn.id
+  defined_tags   = { "${oci_identity_tag_namespace.ArchitectureCenterTagNamespace.name}.${oci_identity_tag.ArchitectureCenterTag.name}" = var.release }
+}
+
+# Create route tables to connect vcn to internet gateway
+
+resource "oci_core_route_table" "application_private_route_table" {
   compartment_id = var.compartment_ocid
   vcn_id         = oci_core_virtual_network.vcn.id
-  display_name   = "route-table"
+  display_name   = "application-private-route-table-${random_string.deploy_id.result}"
+
   route_rules {
-    destination       = "0.0.0.0/0"
-    network_entity_id = oci_core_internet_gateway.ig.id
+    description       = "Traffic to the internet"
+    destination       = lookup(var.application_network_cidrs, "ALL-CIDR")
+    destination_type  = "CIDR_BLOCK"
+    network_entity_id = oci_core_nat_gateway.application_nat_gateway.id
+  }
+  route_rules {
+    description       = "Traffic to OCI services"
+    destination       = lookup(data.oci_core_services.all_services.services[0], "cidr_block")
+    destination_type  = "SERVICE_CIDR_BLOCK"
+    network_entity_id = oci_core_service_gateway.application_service_gateway.id
   }
   defined_tags = { "${oci_identity_tag_namespace.ArchitectureCenterTagNamespace.name}.${oci_identity_tag.ArchitectureCenterTag.name}" = var.release }
 }
+
+resource "oci_core_route_table" "application_public_route_table" {
+  compartment_id = var.compartment_ocid
+  vcn_id         = oci_core_virtual_network.vcn.id
+  display_name   = "application-public-route-table-${random_string.deploy_id.result}"
+
+  route_rules {
+    description       = "Traffic to/from internet"
+    destination       = lookup(var.network_cidrs, "ALL-CIDR")
+    destination_type  = "CIDR_BLOCK"
+    network_entity_id = oci_core_internet_gateway.application_internet_gateway.id
+  }
+  defined_tags = { "${oci_identity_tag_namespace.ArchitectureCenterTagNamespace.name}.${oci_identity_tag.ArchitectureCenterTag.name}" = var.release }
+
+}
+
+
 
 # Create security list to allow internet access from compute and ssh access
 
@@ -102,7 +147,7 @@ resource "oci_core_subnet" "application_public_subnet" {
   compartment_id    = var.compartment_ocid
   vcn_id            = oci_core_virtual_network.vcn.id
   dhcp_options_id   = oci_core_virtual_network.vcn.default_dhcp_options_id
-  route_table_id    = oci_core_route_table.rt.id
+  route_table_id    = oci_core_route_table.application_public_route_table.id
   security_list_ids = [oci_core_security_list.sl.id]
 
   provisioner "local-exec" {
@@ -118,7 +163,7 @@ resource "oci_core_subnet" "application_private_subnet" {
   compartment_id    = var.compartment_ocid
   vcn_id            = oci_core_virtual_network.vcn.id
   dhcp_options_id   = oci_core_virtual_network.vcn.default_dhcp_options_id
-  route_table_id    = oci_core_route_table.rt.id
+  route_table_id    = oci_core_route_table.application_private_route_table.id
   security_list_ids = [oci_core_security_list.sl.id]
   prohibit_public_ip_on_vnic = true
   provisioner "local-exec" {
@@ -134,3 +179,4 @@ resource "oci_core_local_peering_gateway" "test_local_peering_gateway_2" {
   display_name = "Local peering to OKE VCN"
   defined_tags = { "${oci_identity_tag_namespace.ArchitectureCenterTagNamespace.name}.${oci_identity_tag.ArchitectureCenterTag.name}" = var.release }
 }
+

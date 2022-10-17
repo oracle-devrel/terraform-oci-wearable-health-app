@@ -54,3 +54,12 @@ resource "oci_logging_log" "test_log1" {
   }
   timeouts {}
 }
+
+resource "oci_logging_log" "dataflow_log" {
+  display_name       = "${var.app_name}_dataflow_logs"
+  freeform_tags      = {}
+  log_group_id       = oci_logging_log_group.test_log_group.id
+  log_type           = "CUSTOM"
+  defined_tags = { "${oci_identity_tag_namespace.ArchitectureCenterTagNamespace.name}.${oci_identity_tag.ArchitectureCenterTag.name}" = var.release }
+  timeouts {}
+}

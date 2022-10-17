@@ -20,6 +20,14 @@ resource "oci_identity_dynamic_group" "dg_devops" {
   matching_rule  = "Any {ALL {resource.type = 'instance-family', resource.compartment.id = '${var.compartment_ocid}'},ALL {resource.type = 'devopsdeploypipeline', resource.compartment.id = '${var.compartment_ocid}'},ALL {resource.type = 'devopsrepository', resource.compartment.id = '${var.compartment_ocid}'},ALL {resource.type = 'devopsbuildpipeline',resource.compartment.id = '${var.compartment_ocid}'}}"
 }
 
+resource "oci_identity_dynamic_group" "dg_dataflow" {
+  provider       = oci.home_region
+  name           = "${var.app_name}_dataflow_dg_${random_id.tag.hex}"
+  description    = "DevOps  pipeline dynamic group"
+  compartment_id = var.tenancy_ocid
+  matching_rule  = "ALL {resource.type = 'dataflowrun', resource.compartment.id = '${var.compartment_ocid}'}"
+}
+
 ## Policies
 
 resource "oci_identity_policy" "policy" {
@@ -43,8 +51,9 @@ resource "oci_identity_policy" "policy" {
     "Allow dynamic-group ${oci_identity_dynamic_group.dg_devops.name} to manage cluster-family in compartment id ${var.compartment_ocid}",
     "Allow dynamic-group ${oci_identity_dynamic_group.dg_devops.name} to manage secret-family in compartment id ${var.compartment_ocid}",
     "Allow dynamic-group ${oci_identity_dynamic_group.dg_devops.name} to manage functions-family in compartment id ${var.compartment_ocid}",
-    "Allow group Administrators to manage orm-private-endpoints in compartment id ${var.compartment_ocid}",
-    "Allow group Administrators to use virtual-network-family in compartment id ${var.compartment_ocid}"
-
-  ]
+    "Allow dynamic-group ${oci_identity_dynamic_group.dg_devops.name} to manage virtual-network-family in compartment id ${var.compartment_ocid}",
+    "Allow dynamic-group ${oci_identity_dynamic_group.dg_devops.name} to use cabundles in compartment id ${var.compartment_ocid}",
+    "Allow dynamic-group ${oci_identity_dynamic_group.dg_devops.name} to use network-security-groups in compartment id ${var.compartment_ocid}",
+    "Allow dynamic-group ${oci_identity_dynamic_group.dg_dataflow.name} to use all-resources in compartment id ${var.compartment_ocid}"
+     ]
 }
