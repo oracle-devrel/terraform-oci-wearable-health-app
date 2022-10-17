@@ -40,7 +40,20 @@ and [setup guide](https://www.terraform.io/docs/providers/oci/guides/version-3-u
 
 ### Validate the Deployment
 
-- Post the infra deployment , use the application URL to access the sample OCI IOT based UI.
+- Post the infra deployment , use the `application_url` to access the sample OCI IOT based UI.You may refer the stack output to fetch the url.
+- A sample stack output will be as below 
+
+```java
+admin_api_endpoint = "https://xyz.apigateway.<OCI Region>.oci.customer-oci.com/admin-api"
+application_url = "https://objectstorage.<OCI Region>.oraclecloud.com/n/<Name Space>/b/<UI Bucket>/o/index.html"
+deploy_id = "abcd"
+deployed_oke_kubernetes_version = "v1.24.1"
+deployed_to_region = "<OCI Region>"
+dev = "Made with ❤ by Oracle Developers"
+generated_private_key_pem = <sensitive>
+kubeconfig_for_kubectl = "export KUBECONFIG=./generated/kubeconfig"
+
+```
 
 ### Attention point 
 

@@ -109,6 +109,16 @@ resource "oci_devops_build_pipeline" "webui" {
       description   = "Bucket name"
 
     }
+    items {
+      name = "REGION_NAME"
+      default_value = var.region
+      description = "OCI Region"
+    }
+    items {
+      name = "REACT_APP_API_GATEWAY_ENDPOINT"
+      default_value = oci_apigateway_gateway.api_gateway.hostname
+      description = "Gateway endpoint"
+    }
   }
 
 }

@@ -148,12 +148,9 @@ resource "oci_devops_build_run" "webui_buildrun" {
   ]
 
   #Required
-  build_pipeline_id = oci_devops_build_pipeline.dataflow.id
+  build_pipeline_id = oci_devops_build_pipeline.webui.id
 
   #Optional
-  display_name = "dataflow_build_run_${random_id.tag.hex}"
-  provisioner "local-exec" {
-    command = "sleep 600"
-  }
+  display_name = "webui_build_run_${random_id.tag.hex}"
 
 }

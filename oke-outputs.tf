@@ -12,8 +12,11 @@ output "generated_private_key_pem" {
 output "dev" {
   value = "Made with \u2764 by Oracle Developers"
 }
+output "application_url" {
+  value = "https://objectstorage.${var.region}.oraclecloud.com/n/${data.oci_objectstorage_namespace.ns.namespace}/b/${oci_objectstorage_bucket.bucket_webui.name}/o/index.html"
+}
 output "admin_api_endpoint" {
-  value = "https://${oci_apigateway_gateway.api_gateway.hostname}${var.path_prefix}"
+  value = oci_apigateway_deployment.admin_api_deployment.endpoint
 }
 output "deploy_id" {
   value = random_string.deploy_id.result
