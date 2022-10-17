@@ -27,3 +27,20 @@ resource "oci_objectstorage_bucket" "bucket_dataflow_logs" {
   timeouts {}
 }
 
+
+
+resource "oci_objectstorage_object" "upload_dataschema" {
+  depends_on = [null_resource.pushcode,oci_objectstorage_bucket.bucket_dataflow_configs]
+  bucket = oci_objectstorage_bucket.bucket_dataflow_configs.name
+  source = "${path.module}/${var.git_repo_name}/healtheventanalysis/src/main/resources/data_schema.json"
+  namespace = data.oci_objectstorage_namespace.ns.namespace
+  object = "data_schema.json"
+}
+
+resource "oci_objectstorage_object" "upload_healthdata" {
+  depends_on = [null_resource.pushcode,oci_objectstorage_bucket.bucket_dataflow_configs]
+  bucket = oci_objectstorage_bucket.bucket_dataflow_configs.name
+  source = "${path.module}/${var.git_repo_name}/healtheventanalysis/src/main/resources/health_data.json"
+  namespace = data.oci_objectstorage_namespace.ns.namespace
+  object = "health_data.json"
+}
