@@ -1,7 +1,7 @@
 # terraform-oci-wearable-health-app
 
-The repo contains terraform based automation of a sample OCI IOT Application.
-The  application is an IoT use-case, in which an application capturing health parameters running on a wearable device is sending health statistics to a device gateway (backend) hosted on OCI on regular intervals. The complete use-case can be split into 3 different parts:
+The repo contains terraform-based automation of a sample OCI IoT Application.
+The application is an IoT use case, in which an application capturing health parameters running on a wearable device is sending health statistics to a device gateway (backend) hosted on OCI at regular intervals. The complete use case can be split into 3 different parts:
 
 
 
@@ -17,9 +17,9 @@ and [setup guide](https://www.terraform.io/docs/providers/oci/guides/version-3-u
 * [Github issues](https://github.com/terraform-providers/terraform-provider-oci/issues)
 * [Troubleshooting](https://www.terraform.io/docs/providers/oci/guides/guides/troubleshooting.html)
 
-### ⚠️ Specific notice for the service usage.
+### ⚠️ Specific notice for service usage.
 
-- The architecture is using `OCI Messaging queue service` ,which is in the `Limitted Availability Phase` ,reach out to your OCI Contact to get an early access. Refer more in the configuration section.
+- The architecture is using the `OCI Messaging queue service`, which is in the `Limited Availability Phase`, reach out to your OCI Contact to get early access. Refer to more in the configuration section.
 
 ## Deploy Using Oracle Resource Manager
 
@@ -53,8 +53,8 @@ Max Number of delivery attempts: 5
 
 ### Validate the Deployment
 
-- Post the infra deployment , use the `application_url` to access the sample OCI IOT based UI.You may refer the stack output to fetch the url.
-- A sample stack output will be as below 
+- Post the infra deployment, use the `application_url` to access the user interface. You may refer to the stack output to fetch the URL.
+- A sample stack output will be as below
 
 ```java
 admin_api_endpoint = "https://xyz.apigateway.<OCI Region>.oci.customer-oci.com/admin-api"
@@ -82,11 +82,11 @@ Now, you'll want a local copy of this repo. You can make that with the commands:
     cd terraform-oci-wearable-health-app
     ls
 ```
- 
+
 ### Prerequisites
 First off, you'll need to do some pre-deploy setup.  That's all detailed [here](https://github.com/cloud-partners/oci-prerequisites).
 
-Secondly, create a `terraform.tfvars` file and populate with the following information:
+Secondly, create a `terraform. tfvars` file and populate it with the following information:
 
 ```
 # Authentication
@@ -108,7 +108,7 @@ oci_user_name       = "<oci_username>
 #If you are using OCI's direct sign-in, enter the username in the following format: TenancyName/YourUserName. For example, Acme/alice_jones. Your password is the auth token you created previously.
 
 oci_user_authtoken = "<oci_user_authtoken>" 
-# You can get the auth token from your Profile menu -> click User Settings -> On left side  click *Auth Tokens -> Generate Token
+# You can get the auth token from your Profile menu -> click User Settings -> On the left side  click *Auth Tokens -> Generate Token
 
 #My Application Related variables
 
@@ -129,22 +129,27 @@ Deploy:
 
 
 ## Destroy the Deployment
-- Delete all the artifacts with in the `OCI Artifact repository` then follow terraform command and destroy.
-- Delete any additional resources (loadbalancers,PVs,Secrets,Private Endpoints .. ) created using the terraform provisioned components using console.
-- Vault will change  in to `pending deletion` state after the destroy execution.
+- Delete all the artifacts within the `OCI Artifact repository` then follow terraform command and destroy.
+- Delete any additional resources (load balancers, PVs, Secrets, Private Endpoints .. ) created using the terraform provisioned components using the console.
+- Vault will change into a `pending deletion` state after the destroy execution.
 
 ```java
 terraform destroy
 ```
-    
+
 
 ## Contributing
-This project is open source.  Please submit your contributions by forking this repository and submitting a pull request!  Oracle appreciates any contributions that are made by the open source community.
+This project is open source.  Please submit your contributions by forking this repository and submitting a pull request!  Oracle appreciates any contributions that are made by the open-source community.
 
 ### Attribution & Credits
 - Rahul M R (https://github.com/RahulMR42)
 
 ## License
 Copyright (c) 2022 Oracle and/or its affiliates.
+
 Licensed under the Universal Permissive License (UPL), Version 1.0.
-See [LICENSE](LICENSE) for more details.
+
+See LICENSE for more details.
+
+ORACLE AND ITS AFFILIATES DO NOT PROVIDE ANY WARRANTY WHATSOEVER, EXPRESS OR IMPLIED, FOR ANY SOFTWARE, MATERIAL OR CONTENT OF ANY KIND CONTAINED OR PRODUCED WITHIN THIS REPOSITORY, AND IN PARTICULAR SPECIFICALLY DISCLAIM ANY AND ALL IMPLIED WARRANTIES OF TITLE, NON-INFRINGEMENT, MERCHANTABILITY, AND FITNESS FOR A PARTICULAR PURPOSE. FURTHERMORE, ORACLE AND ITS AFFILIATES DO NOT REPRESENT THAT ANY CUSTOMARY SECURITY REVIEW HAS BEEN PERFORMED WITH RESPECT TO ANY SOFTWARE, MATERIAL OR CONTENT CONTAINED OR PRODUCED WITHIN THIS REPOSITORY. IN ADDITION, AND WITHOUT LIMITING THE FOREGOING, THIRD PARTIES MAY HAVE POSTED SOFTWARE, MATERIAL OR CONTENT TO THIS REPOSITORY WITHOUT ANY REVIEW. USE AT YOUR OWN RISK.
+
