@@ -14,6 +14,11 @@ resource "oci_dataflow_application" "core_application" {
     "spark.dynamicAllocation.minExecutors"            = var.dataflow_minExecutors
     "spark.dynamicAllocation.schedulerBacklogTimeout" = "60"
     "spark.dynamicAllocation.shuffleTracking.enabled" = "true"
+    "spark.driverEnv.QUEUE_OCID" = var.oci_queue_ocid
+    "spark.driverEnv.DP_CLIENT" = "https://cell-1.queue.messaging.${var.region}.oci.oraclecloud.com"
+    "spark.driverEnv.STREAM_POOL_ID" = oci_streaming_stream.test_stream.stream_pool_id
+    "spark.driverEnv.BOOT_STRAP_SERVER" = "cell-1.streaming.${var.region}.oci.oraclecloud.com:9092"
+    "spark.driverEnv.STREAM_NAME" = oci_streaming_stream.test_stream.name
   }
   description        = "Data flow for ${var.app_name}"
   display_name       = "${var.app_name}_dataflow"

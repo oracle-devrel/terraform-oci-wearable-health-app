@@ -5,7 +5,6 @@ The  application is an IoT use-case, in which an application capturing health pa
 
 
 
-
 For details of the architecture, see [oci-wearable-health-app](https://github.com/oracle-devrel/oci-wearable-health-app)
 
 ## Terraform Provider for Oracle Cloud Infrastructure
@@ -18,9 +17,13 @@ and [setup guide](https://www.terraform.io/docs/providers/oci/guides/version-3-u
 * [Github issues](https://github.com/terraform-providers/terraform-provider-oci/issues)
 * [Troubleshooting](https://www.terraform.io/docs/providers/oci/guides/guides/troubleshooting.html)
 
+### ⚠️ Specific notice for the service usage.
+
+- The architecture is using `OCI Messaging queue service` ,which is in the `Limitted Availability Phase` ,reach out to your OCI Contact to get an early access. Refer more in the configuration section.
+
 ## Deploy Using Oracle Resource Manager
 
-1. Click [![Deploy to Oracle Cloud](https://oci-resourcemanager-plugin.plugins.oci.oraclecloud.com/latest/deploy-to-oracle-cloud.svg)](https://cloud.oracle.com/resourcemanager/stacks/create?region=home&zipUrl=https://github.com/oracle-devrel/terraform-oci-arch-devops-cicd-instances/releases/latest/download/terraform-oci-wearable-health-app.zip)
+1. Click  [![Deploy to Oracle Cloud](https://oci-resourcemanager-plugin.plugins.oci.oraclecloud.com/latest/deploy-to-oracle-cloud.svg)](https://cloud.oracle.com/resourcemanager/stacks/create?region=home&zipUrl=https://github.com/oracle-devrel/terraform-oci-arch-devops-cicd-instances/releases/latest/download/terraform-oci-wearable-health-app.zip)
 
    If you aren't already signed in, when prompted, enter the tenancy and user credentials.
 
@@ -37,6 +40,16 @@ and [setup guide](https://www.terraform.io/docs/providers/oci/guides/version-3-u
    To make any changes, return to the Stack Details page, click **Edit Stack**, and make the required changes. Then, run the **Plan** action again.
 
 7. If no further changes are necessary, return to the Stack Details page, click **Terraform Actions**, and select **Apply**.
+
+### Configuration for OCI Queue service.
+
+```java
+queue name: health-alert-queue
+max retention period: 7 days
+deadletter queue name: health-alert-queue - DLQ
+visibility timeout: 2 minutes
+Max Number of delivery attempts: 5
+```
 
 ### Validate the Deployment
 
@@ -55,9 +68,7 @@ kubeconfig_for_kubectl = "export KUBECONFIG=./generated/kubeconfig"
 
 ```
 
-### Attention point 
 
-- The architecture is using `OCI Messaging queue service` ,which is in the `Limitted Availability Phase` ,reach out to your OCI Contact to get an early access.
 
 ## Deploy Using the Terraform CLI
 
