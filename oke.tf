@@ -72,20 +72,20 @@ locals {
   is_flexible_node_shape = contains(local.compute_flexible_shapes, var.node_pool_shape)
 }
 
-#resource "null_resource" "external_secrets_setup" {
-#  depends_on = [module.oci-oke]
-#  provisioner "local-exec" {
-#      command    = <<-EOT
-#      export KUBECONFIG=${path.module}/generated/kubeconfig
-#      kubectl create ns ${var.oke_namespace}
-#      helm repo add external-secrets ${var.oke_externalsecret_operator_url}
-#      helm install external-secrets external-secrets/external-secrets -n external-secrets --create-namespace
-#      sleep 10;kubectl get ValidatingWebhookConfiguration -A 1>/dev/null
-#      kubectl apply -n ${var.oke_namespace} -f ${path.module}/${var.git_repo_name}/external-secret-manifest/es-manifest.yaml
-#      kubectl apply -f https://github.com/kubernetes-sigs/metrics-server/releases/download/${var.metric_server_version}/components.yaml
-#
-#  EOT
-#  }
-#}
+resource "null_resource" "external_secrets_setup" {
+  depends_on = [module.oci-oke]
+  provisioner "local-exec" {
+      command    = <<-EOT
+      export KUBECONFIG=${path.module}/generated/kubeconfig
+      kubectl create ns ${var.oke_namespace}
+      helm repo add external-secrets ${var.oke_externalsecret_operator_url}
+      helm install external-secrets external-secrets/external-secrets -n external-secrets --create-namespace
+      sleep 10;kubectl get ValidatingWebhookConfiguration -A 1>/dev/null
+      kubectl apply -n ${var.oke_namespace} -f ${path.module}/${var.git_repo_name}/external-secret-manifest/es-manifest.yaml
+      kubectl apply -f https://github.com/kubernetes-sigs/metrics-server/releases/download/${var.metric_server_version}/components.yaml
+
+  EOT
+  }
+}
 
 
