@@ -119,6 +119,16 @@ resource "oci_devops_build_pipeline" "webui" {
       default_value = oci_apigateway_gateway.api_gateway.hostname
       description = "Gateway endpoint"
     }
+    items {
+      name = "PUBLIC_URL"
+      default_value = "/n/${data.oci_objectstorage_namespace.ns.namespace}/b/${oci_objectstorage_bucket.bucket_webui.name}/o/"
+      description = "Bucket information"
+    }
+    items {
+      name = "REACT_APP_WEBSITE_NAME"
+      default_value = "OCI Wearable APP Demo"
+      description = "Website title"
+    }
   }
 
 }
