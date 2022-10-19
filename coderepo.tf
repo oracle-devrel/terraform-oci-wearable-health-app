@@ -109,9 +109,6 @@ resource "null_resource" "update_placeholders" {
       mv  ${path.module}/${var.git_repo_name}/notification-service/manifest/deployment.yaml.tmp ${path.module}/${var.git_repo_name}/notification-service/manifest/deployment.yaml
       cat ${path.module}/${var.git_repo_name}/tcp-server/manifest/deployment.yaml|envsubst >${path.module}/${var.git_repo_name}/tcp-server/manifest/deployment.yaml.tmp
       mv ${path.module}/${var.git_repo_name}/tcp-server/manifest/deployment.yaml.tmp ${path.module}/${var.git_repo_name}/tcp-server/manifest/deployment.yaml
-      cp ${path.module}/instance_bootstrap ${path.module}/instance_bootstrap_origin
-      cat ${path.module}/instance_bootstrap |envsubst >${path.module}/instance_bootstrap.tmp
-      mv ${path.module}/instance_bootstrap.tmp ${path.module}/instance_bootstrap
       cat ${path.module}/manifest/dbsetup_build_spec.yaml |envsubst >${path.module}/${var.git_repo_name}/DB-Setup/build_spec.yaml
     EOT
 
