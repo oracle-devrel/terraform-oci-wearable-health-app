@@ -47,7 +47,7 @@ resource "null_resource" "clonefromgithub" {
   }
 
   provisioner "local-exec" {
-    command = "git clone -b ${var.git_branch} ${var.git_repo};"
+    command = "echo 'Cloning from ${var.git_repo} with Branch  ${var.git_branch}';git clone -b ${var.git_branch} ${var.git_repo};"
   }
 }
 
