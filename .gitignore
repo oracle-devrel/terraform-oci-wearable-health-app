@@ -3,6 +3,22 @@
 .AppleDouble
 .LSOverride
 
+# Local files
+.DS_Store
+.AppleDouble
+.LSOverride
+.idea
+java-oci-wearable
+oci-wearable-demo
+generated
+old-ref
+.pluralith
+.cloud-init
+oci-wearable-health-app
+#instance_bootstrap
+instance_bootstrap*
+
+
 # Icon must end with two \r
 Icon
 
@@ -31,3 +47,17 @@ Temporary Items
 .crt
 .csr
 .pem
+
+# Local .terraform directories
+**/.terraform/*
+
+# .tfstate files
+*.tfstate
+*.tfstate.*
+*.zip*
+*.tfvars
+*.out
+plan.json
+
+# terraform lock file
+**/.terraform.lock.hcl

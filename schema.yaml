@@ -1,0 +1,901 @@
+## Copyright (c) 2022, Oracle and/or its affiliates.
+## All rights reserved. The Universal Permissive License (UPL), Version 1.0 as shown at http://oss.oracle.com/licenses/upl
+
+title: "Deployment OCI IOT Wearable Application"
+stackDescription: "Deployment OCI IOT Wearable Application"
+description: "Deployment on OCI IOT Wearable Application using OCI Resources."
+schemaVersion: 1.1.0
+version: "20221013"
+locale: "en"
+
+#################
+# Variable Groups
+#################
+variableGroups:
+  - title: "General Configuration"
+    visible: false
+    variables:
+      - tenancy_ocid
+      - compartment_ocid
+      - region
+      - oke_compartment_description
+      - user_ocid
+      - fingerprint
+      - private_key_path
+      - network_cidrs
+      - node_pool_boot_volume_size_in_gbs
+      - release
+      - dataflow_arguments
+      - mysql_db_system_freeform_tags
+      - mysql_instance_compartment_name
+      - mysql_instance_compartment_ocid
+      - mysql_network_compartment_name
+      - mysql_network_compartment_ocid
+      - repository_description
+      - repository_repository_type
+      - vault_key_protection_mode
+      - vault_key_shape_algorithm
+      - vault_vault_type
+
+  - title: "Required Configuration"
+    visible: true
+    variables:
+      - oci_user_name 
+      - oci_user_authtoken 
+      - mysql_db_system_admin_username 
+      - mysql_db_system_admin_password 
+      - oci_queue_ocid
+      - smtp_user_ocid
+      - show_advanced 
+
+  - title: "DevOps Configurations"
+    visible: true
+    variables:
+      - app_name
+      - container_repository_is_public
+      - repository_name
+      - project_logging_config_retention_period_in_days
+      - repository_default_branch
+      - buildparam_baseimage_notificationservice
+      - notification_buildspec
+      - tcpserver_buildspec
+      - adminapi_buildspec
+      - adminapi_authorizer_buildspec
+      - dataflow_buildspec
+      - dbsetup_buildspec
+      - build_pipeline_stage_image
+      - oke_namespace
+      - vault_app_env_user
+
+  - title: "External Configurations"
+    visible: true
+    variables:
+      - git_branch
+      - git_repo
+      - git_repo_name
+      - oke_externalsecret_operator_url
+      - metric_server_version
+
+  - title: "Encryption Settings"
+    description: Policy setting for the stack deployment
+    visible: true
+    variables:
+      - use_encryption_from_oci_vault
+      - create_new_encryption_key
+      - existent_encryption_key_id
+      - create_vault_policies_for_group
+      - user_admin_group_for_vault_policy
+
+  - title: "OKE Cluster Configuration"
+    visible: true
+    variables:
+      - create_new_oke_cluster 
+      - existent_oke_cluster_id - DONE
+      - create_new_compartment_for_oke 
+      - oke_compartment_description 
+      - cluster_options_add_ons_is_kubernetes_dashboard_enabled 
+      - cluster_options_admission_controller_options_is_pod_security_policy_enabled 
+      - cluster_workers_visibility 
+      - cluster_endpoint_visibility 
+      - k8s_version 
+
+  - title: "OKE Worker Nodes Configuration"
+    visible: true
+    variables:
+      - generate_public_ssh_key 
+      - public_ssh_key 
+      - num_pool_workers 
+      - node_pool_name 
+      - node_pool_shape 
+      - node_pool_node_shape_config_ocpus 
+      - node_pool_node_shape_config_memory_in_gbs 
+      - image_operating_system 
+      - image_operating_system_version 
+      - create_dynamic_group_for_nodes_in_compartment 
+      - existent_dynamic_group_for_nodes_in_compartment 
+      - create_compartment_policies 
+      - create_tenancy_policies 
+
+  - title: "Api Gateway Configurations"
+    visible: true
+    variables:
+      - gateway_visibility
+      - path_prefix
+
+  - title: "Objectstore Configurations"
+    visible: true
+    variables:
+      - bucket_access_type
+      - bucket_storage_tier
+      - bucket_versioning
+
+  - title: "Stream Configurations"
+    visible: true
+    variables:
+      - stream_partition_count
+      - stream_retention_in_hours
+
+  - title: "SMTP Configurations"
+    visible: true
+    variables:
+      - auth_profile
+      - sender_email_address
+
+  - title: "Data Flow Configurations"
+    visible: true
+    variables:
+      - dataflow_mainclass
+      - dataflow_maxExecutors
+      - dataflow_minExecutors
+      - dataflow_driver_shape
+      - dataflow_executor_shape
+      - dataflow_num_executors
+      - dataflow_spark_version
+      - dataflow_type
+      - dataflow_driver_shape_config_memory_in_gbs
+      - dataflow_driver_shape_config_ocpus
+      - dataflow_executor_shape_config_memory_in_gbs
+      - dataflow_executor_shape_config_ocpus
+
+  - title: "MySQL Configurations"
+    visible: true
+    variables:
+      - mysql_db_system_backup_policy_is_enabled
+      - mysql_db_system_backup_policy_retention_in_days
+      - mysql_db_system_backup_policy_window_start_time
+      - mysql_db_system_data_storage_size_in_gb
+      - mysql_db_system_is_highly_available
+      - mysql_db_system_port
+      - mysql_db_system_port_x
+      - mysql_shape_name
+      - mysql_heatwave_enabled
+      - mysql_heatwave_cluster_size
+      - mysql_heatwave_shape
+
+
+#################
+# Output Groups
+#################
+
+
+######################
+# Variable Definitions
+######################
+
+variables:
+
+  # Required
+
+  oci_user_name: 
+    type: string
+    required: true
+    visibile: true
+    title: "OCI username"
+    description: "For a federated user (single sign-on with an identity provider), enter the username in the following format: TenancyName/Federation/UserName. For example, if you use OCI's identity provider, your login would be, Acme/oracleidentitycloudservice/alice.jones@acme.com. If you are using OCI's direct sign-in, enter the username in the following format: TenancyName/YourUserName. For example, Acme/alice_jones. Your password is the auth token you created previously."
+
+  oci_user_authtoken: 
+    type: password
+    required: true
+    visibile: true
+    title: "OCI user auth token"
+    description: "You can get the auth token from your Profile menu -> click User Settings -> On left side  click *Auth Tokens -> Generate Token"
+
+  mysql_db_system_admin_username: 
+    type: string
+    required: true
+    visibile: true
+    title: "DB Username"
+    description: "Username for DB MySQL interactions"
+
+  mysql_db_system_admin_password: 
+    type: password
+    required: true
+    visibile: true
+    title: "DB Password"
+    description: "The password for the administrative user. The password must be between 8 and 32 characters long, and must contain at least 1 numeric character, 1 lowercase character, 1 uppercase character, and 1 special (nonalphanumeric) character"
+
+  oci_queue_ocid:
+    type: string
+    required: true
+    visibile: true
+    title: "OCID of OCI Queue"
+    description: "Queue service is in LA ,please reach out your Oracle support to enable it for your tenancy"
+
+  smtp_user_ocid:
+    type: string
+    required: true
+    visibile: true
+    title: "SMTP User OCID"
+    description: "Preferably your user's OCID"
+
+  show_advanced: 
+    type: boolean
+    title: "Show advanced options?"
+    description: "Shows advanced options."
+    visible: true
+    default: false
+
+  app_name:
+    type: string
+    title: "Pre fix for OCI Resources"
+    required: true
+
+  oke_namespace:
+    type: string
+    title: "Application namespace"
+    required: true
+    visible: true
+
+  vault_app_env_user:
+    type: string
+    title: "Application env user"
+    required: true
+    visible: true
+
+  container_repository_is_public:
+    type: boolean
+    title: "Is Container Repository public?"
+    required: false
+    visible: true
+
+  project_logging_config_retention_period_in_days:
+    type: string
+    title: "Project Logs retention period"
+    description: "Days to retain logs from the Project."
+    default: 30
+    required: true
+    visible:
+      and:
+        - show_advanced
+
+  repository_name:
+    type: string
+    title: "DevOps Repository Name"
+    description: "Name for DevOps Repository"
+    required: false
+    visible: true
+
+  create_new_oke_cluster:
+    type: boolean
+    title: "Create new OKE cluster?"
+    required: false
+
+  existent_oke_cluster_id:
+    type: string
+    required: false
+    visible:
+      not:
+        - create_new_oke_cluster
+    title: "Use existing OKE cluster OCID"
+
+  create_new_compartment_for_oke:
+    type: boolean
+    required: false
+    visible:
+      and:
+        - create_new_oke_cluster
+    title: "Create new compartment for OKE"
+
+  oke_compartment_description:
+    type: string
+    required: false
+    visible:
+      and:
+        - create_new_oke_cluster
+    title: "OKE new compartment description"
+
+  cluster_options_add_ons_is_kubernetes_dashboard_enabled:
+    type: boolean
+    required: false
+    visible:
+      and:
+        - create_new_oke_cluster
+    title: "OKE Cluster Add-ons: Enabled Kubernetes Dashboard?"
+
+  cluster_options_admission_controller_options_is_pod_security_policy_enabled:
+    type: boolean
+    required: false
+    visible:
+      and:
+        - create_new_oke_cluster
+    title: "OKE Cluster Add-ons: Admission Controler options - Enabled POD Security Policy?"
+
+  cluster_workers_visibility:
+    type: enum
+    required: false
+    visible:
+      and:
+        - create_new_oke_cluster
+    title: "Choose OKE Worker Nodes visibility type"
+    enum:
+      - "Private"
+      - "Public"
+
+  cluster_endpoint_visibility:
+    type: enum
+    required: false
+    visible:
+      and:
+        - create_new_oke_cluster
+    title: "Choose OKE API Endpoint visibility type"
+    enum:
+      - "Private"
+      - "Public"
+
+  use_encryption_from_oci_vault:
+    type: boolean
+    required: false
+    title: "Encrypt using Customer-Managed Keys instead of Oracle Managed Encryption"
+    visible:
+      and:
+        - create_new_oke_cluster
+        - show_advanced
+
+  create_new_encryption_key:
+    type: boolean
+    required: false
+    visible:
+      and:
+        - create_new_oke_cluster
+        - show_advanced
+        - use_encryption_from_oci_vault
+    title: "Create New Encryption Key?"
+
+  existent_encryption_key_id:
+    type: string
+    title: "Existent Encryption Key OCID"
+    required: false
+    visible:
+      and:
+        - and:
+            - create_new_oke_cluster
+            - show_advanced
+            - use_encryption_from_oci_vault
+        - not:
+            - create_new_encryption_key
+
+  create_vault_policies_for_group:
+    type: boolean
+    title: "Create policies for the user group to manage vault and keys"
+    visible:
+      and:
+        - create_new_oke_cluster
+        - show_advanced
+        - use_encryption_from_oci_vault
+        - create_new_encryption_key
+
+  user_admin_group_for_vault_policy:
+    type: string
+    title: "Specify your group to include the policy"
+    visible:
+      and:
+        - create_new_oke_cluster
+        - show_advanced
+        - use_encryption_from_oci_vault
+        - create_new_encryption_key
+        - create_vault_policies_for_group
+
+  k8s_version:
+    type: enum
+    enum: # Necessary hardcoded supported versions, as ORM does not retrieve the versions from OKE.
+      - "Latest"
+      - "v1.24.1"
+      - "v1.23.4"
+
+    title: "Kubernetes Version"
+    required: false
+    default: "Latest"
+    visible:
+      and:
+        - create_new_oke_cluster
+        - show_advanced
+
+  generate_public_ssh_key:
+    type: boolean
+    title: "Auto generate public ssh key?"
+    required: true
+    visible:
+      and:
+        - create_new_oke_cluster
+        - show_advanced
+
+  public_ssh_key:
+    type: oci:core:ssh:publickey
+    title: "Import your own SSH public key"
+    additionalProps:
+      allowMultiple: true
+    required: false
+    pattern: "((^(ssh-rsa AAAAB3NzaC1yc2|ecdsa-sha2-nistp256 AAAAE2VjZHNhLXNoYTItbmlzdHAyNT|ecdsa-sha2-nistp384 AAAAE2VjZHNhLXNoYTItbmlzdHAzODQAAAAIbmlzdHAzOD|ecdsa-sha2-nistp521 AAAAE2VjZHNhLXNoYTItbmlzdHA1MjEAAAAIbmlzdHA1Mj|ssh-ed25519 AAAAC3NzaC1lZDI1NTE5|ssh-dss AAAAB3NzaC1kc3)[0-9A-Za-z+\/]+[=]{0,3})( [^,]*)?)(,((ssh-rsa AAAAB3NzaC1yc2|ecdsa-sha2-nistp256 AAAAE2VjZHNhLXNoYTItbmlzdHAyNT|ecdsa-sha2-nistp384 AAAAE2VjZHNhLXNoYTItbmlzdHAzODQAAAAIbmlzdHAzOD|ecdsa-sha2-nistp521 AAAAE2VjZHNhLXNoYTItbmlzdHA1MjEAAAAIbmlzdHA1Mj|ssh-ed25519 AAAAC3NzaC1lZDI1NTE5|ssh-dss AAAAB3NzaC1kc3)[0-9A-Za-z+\/]+[=]{0,3})( [^,]*)?)*$"
+    visible:
+      and:
+        - and:
+            - create_new_oke_cluster
+            - show_advanced
+        - not:
+            - generate_public_ssh_key
+
+  num_pool_workers:
+    type: integer
+    title: "Number of Worker Nodes"
+    minimum: 1
+    maximum: 1000
+    required: true
+    visible:
+      and:
+        - create_new_oke_cluster
+
+  node_pool_name:
+    type: string
+    title: "Node Pool Name"
+    required: false
+    visible:
+      and:
+        - create_new_oke_cluster
+        - show_advanced
+
+  node_pool_shape:
+    type: oci:core:instanceshape:name
+    title: "Select a shape for the Worker Nodes instances"
+    required: false
+    dependsOn:
+      compartmentId: compartment_ocid
+    visible:
+      and:
+        - create_new_oke_cluster
+
+  node_pool_node_shape_config_ocpus:
+    type: integer
+    minimum: 1
+    maximum: 64
+    title: "Number of OCPUs"
+    visible:
+      and:
+        - and:
+            - create_new_oke_cluster
+        - or:
+            - eq:
+                - node_pool_shape
+                - "VM.Standard.E3.Flex"
+            - eq:
+                - node_pool_shape
+                - "VM.Standard.E4.Flex"
+            - eq:
+                - node_pool_shape
+                - "VM.Standard.A1.Flex"
+
+  node_pool_node_shape_config_memory_in_gbs:
+    type: integer
+    minimum: 1
+    maximum: 1024
+    title: "Amount of memory (GB)"
+    visible:
+      and:
+        - and:
+            - create_new_oke_cluster
+        - or:
+            - eq:
+                - node_pool_shape
+                - "VM.Standard.E3.Flex"
+            - eq:
+                - node_pool_shape
+                - "VM.Standard.E4.Flex"
+            - eq:
+                - node_pool_shape
+                - "VM.Standard.A1.Flex"
+
+  image_operating_system:
+    type: enum
+    title: "Image OS"
+    enum:
+      - "Oracle Linux"
+    required: false
+    visible:
+      and:
+        - create_new_oke_cluster
+        - show_advanced
+
+  image_operating_system_version:
+    type: string
+    required: false
+    title: "Image OS Version"
+    visible:
+      and:
+        - create_new_oke_cluster
+        - show_advanced
+
+  create_dynamic_group_for_nodes_in_compartment:
+    type: boolean
+    title: "Create Dynamic Group for Worker Nodes in the Compartment"
+    required: false
+    visible:
+      and:
+        - show_advanced
+
+  existent_dynamic_group_for_nodes_in_compartment:
+    type: string
+    required: false
+    title: "Existent Dynamic Group"
+    visible:
+      and:
+        - and:
+            - show_advanced
+        - or:
+            - create_compartment_policies
+            - create_tenancy_policies
+        - not:
+            - create_dynamic_group_for_nodes_in_compartment
+
+  create_compartment_policies:
+    type: boolean
+    title: "Create Compartment Policies"
+    required: false
+    visible:
+      and:
+        - show_advanced
+
+  create_tenancy_policies:
+    type: boolean
+    title: "Create Tenancy Policies"
+    required: false
+    visible:
+      and:
+        - show_advanced
+        -
+  repository_default_branch:
+    type: string
+    title: "DevOps Repository Default Branch"
+    description: "Choose Defaulf Branch for DevOps Repository"
+    required: true
+    visible: true
+
+  buildparam_baseimage_notificationservice:
+    type: string
+    title: "JDK Base image for notification service"
+    description: "JDK Base image for notification service"
+    required: true
+    visible: true
+
+  notification_buildspec:
+    type: string
+    title: "Build spec for notification service"
+    description: "Build spec for notification service"
+    required: true
+    visible: true
+
+  tcpserver_buildspec:
+    type: string
+    title: "Build spec for tcp-server service"
+    description: "Build spec for tcp-server service"
+    required: true
+    visible: true
+
+  adminapi_buildspec:
+    type: string
+    title: "Build spec for admin-api service"
+    description: "Build spec for admin-api service"
+    required: true
+    visible: true
+
+  dataflow_buildspec:
+    type: string
+    title: "Build spec for dataflow service"
+    description: "Build spec for dataflow service"
+    required: true
+    visible: true
+
+  dbsetup_buildspec:
+    type: string
+    title: "Build spec for dbsetup service"
+    description: "Build spec for dbsetup service"
+    required: true
+    visible: true
+
+  build_pipeline_stage_image:
+    type: string
+    title: "Base image  for buildpipeline"
+    description: "Base image  for buildpipeline"
+    required: false
+    visible: true
+
+  adminapi_authorizer_buildspec:
+    type: string
+    title: "Build spec for admin-authorizer service"
+    description: "Build spec for admin-authorizer service"
+    required: true
+    visible: true
+
+  project_description:
+    type: string
+    title: "DevOps Project Description"
+    description: "A short description for the DevOps project"
+    required: false
+    visible:
+      and:
+        - show_advanced
+
+  git_branch:
+    type: string
+    title: "Github branch"
+    description: "Branch from which the application code will be pulled"
+    required: true
+    visible: true
+
+  git_repo:
+    type: string
+    title: "Github repo"
+    description: "URL of Github repo from which the application code will be pulled"
+    required: true
+    visible: true
+
+  git_repo_name:
+    type: string
+    title: "Github repo name"
+    description: "Github repo name from which the application code will be pulled,must be same name as that of external Github repo"
+    required: true
+    visible: true
+
+  oke_externalsecret_operator_url:
+    type: string
+    title: "External Secret opreator"
+    description: "URL of external sercret operator repo url"
+    required: true
+    visible: true
+
+  metric_server_version:
+    type: string
+    title: "OKE dashboard metric version"
+    description: "OKE dashboard metric version"
+    required: true
+    visible: true
+
+  path_prefix:
+    type: string
+    title: "API Gateway deployment prefix"
+    description: "API Gateway deployment prefix"
+    required: true
+    visible: true
+
+  gateway_visibility:
+    type: enum
+    enum:
+      - "PUBLIC"
+      - "PRIVATE"
+
+    title: "API Gateway visibility"
+    required: true
+    default: "PUBLIC"
+    visible: true
+
+
+  bucket_access_type:
+    type: enum
+    enum:
+      - "NoPublicAccess"
+      - "ObjectRead"
+      - "ObjectReadWithoutList"
+
+    title: "Object storage visibility "
+    required: true
+    default: "NoPublicAccess"
+    visible: true
+
+  bucket_storage_tier:
+    type: string
+    title: "Object storage bucket tier"
+    description: "Object storage bucket tier"
+    required: true
+    visible: true
+
+  bucket_versioning:
+    type: string
+    title: "Object storage bucket version"
+    description: "Object storage bucket version"
+    required: true
+    visible: true
+
+  stream_partition_count:
+    type: string
+    title: "Dataflow stream partition count"
+    description: "Dataflow stream partition count"
+    required: true
+    visible: true
+
+  auth_profile:
+    type: string
+    title: "SMTP Auth profile"
+    description: "SMTP Auth profile"
+    required: true
+    visible: true
+
+  stream_retention_in_hours:
+    type: string
+    title: "Dataflow stream retention "
+    description: "Dataflow stream retention in hours"
+    required: true
+    visible: true
+
+  sender_email_address:
+    type: string
+    title: "SMTP from mail address"
+    description: "SMTP from mail address"
+    required: true
+    visible: true
+
+  dataflow_mainclass:
+    type: string
+    title: "Dataflow mainclass"
+    description: "Dataflow mainclass"
+    required: true
+    visible: true
+
+  dataflow_maxExecutors:
+    type: string
+    title: "Dataflow maximum executors"
+    description: "Dataflow maximum executors"
+    required: true
+    visible: true
+
+  dataflow_minExecutors:
+    type: string
+    title: "Dataflow minimum executors"
+    description: "Dataflow minimum executors"
+    required: true
+    visible: true
+
+  dataflow_driver_shape:
+    type: string
+    title: "Dataflow driver shape"
+    description: "Dataflow driver shape"
+    required: true
+    visible: true
+
+  dataflow_executor_shape:
+    type: string
+    title: "Dataflow executor shape"
+    description: "Dataflow executor shape"
+    required: true
+    visible: true
+
+  dataflow_num_executors:
+    type: string
+    title: "Dataflow executor count "
+    description: "Dataflow number of executors"
+    required: true
+    visible: true
+
+  dataflow_type:
+    type: string
+    title: "Dataflow type"
+    description: "Dataflow type"
+    required: true
+    visible: true
+
+  dataflow_driver_shape_config_memory_in_gbs:
+    type: string
+    title: "Dataflow driver shape config memory"
+    description: "Memory in GBs"
+    required: true
+    visible: true
+
+  dataflow_executor_shape_config_memory_in_gbs:
+    type: string
+    title: "Dataflow executor shape config memory"
+    description: "Memory in GBs"
+    required: true
+    visible: true
+
+  dataflow_executor_shape_config_ocpus:
+    type: string
+    title: "Dataflow executor shape config cpu counts"
+    description: "CPU Counts"
+    required: true
+    visible: true
+
+  dataflow_driver_shape_config_ocpus:
+    type: string
+    title: "Dataflow driver shape config cpu counts"
+    description: "CPU Counts"
+    required: true
+    visible: true
+
+  dataflow_spark_version:
+    type: string
+    title: "Dataflow spark version"
+    description: "Dataflow spark version"
+    required: true
+    visible: true
+
+  mysql_db_system_backup_policy_window_start_time:
+    type: string
+    title: "DB Backup policy start time"
+    description: "The start of a 30-minute window of time in which daily, automated backups occur. This should be in the format of the Time portion of an RFC3339-formatted timestamp. Any second or sub-second time data will be truncated to zero. At some point in the window, the system may incur a brief service disruption as the backup is performed."
+    required: true
+    visible: false
+
+  mysql_db_system_data_storage_size_in_gb:
+    type: string
+    title: "DB Storage size "
+    description: "Storage size in GB"
+    required: true
+    visible: true
+
+  mysql_shape_name:
+    type: string
+    title: "DB Compute shape"
+    description: "The name of the shape. The shape determines the resources allocated. CPU cores and memory for VM shapes; CPU cores, memory and storage for non-VM (or bare metal) shapes"
+    required: true
+    visible: true
+
+
+  mysql_db_system_port_x:
+    type: string
+    title: "DB system port X"
+    description: "The TCP network port on which X Plugin listens for connections. This is the X Plugin equivalent of port"
+    required: true
+    visible: true
+
+  mysql_db_system_port:
+    type: string
+    title: "DB system port"
+    description: "The port for primary endpoint of the DB System to listen on"
+    required: true
+    visible: true
+
+  mysql_heatwave_cluster_size:
+    type: string
+    title: "Count of DB heatwave cluster nodes "
+    description: "Number of MySQL HeatWave nodes to be created"
+    required: true
+    visible: true
+
+  mysql_heatwave_shape:
+    type: string
+    title: "MySQL Heatwave compute shape"
+    description: "The shape to be used instead of mysql_shape_name when mysql_heatwave_enabled = true"
+    required: true
+    visible: true
+
+  mysql_db_system_backup_policy_retention_in_days:
+    type: string
+    title: "DB Backup policy retention in days"
+    description: "DB Backup policy retention in days"
+    required: true
+    visible: true
+
+  mysql_db_system_is_highly_available:
+    type: boolean
+    title: "DB HA enabled?"
+    required: true
+    visible: true
+
+  mysql_heatwave_enabled:
+    type: boolean
+    title: "Defines whether a MySQL HeatWave cluster is enabled"
+    required: true
+    visible: true
+
+  mysql_db_system_backup_policy_is_enabled:
+    type: boolean
+    title: "DB Backup enabled?"
+    required: true
+    visible: true

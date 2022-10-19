@@ -1,0 +1,34 @@
+version: 0.1
+component: build
+timeoutInSeconds: 6000
+runAs: root
+shell: bash
+env:
+  variables:
+    MYSQL_RPM_VERSION: "8.0.31-1"
+  vaultVariables:
+    DB_PASSWORD_VALUE: ${DATA_SOURCE_PASS_OCID_VALUE}
+  exportedVariables:
+inputArtifacts:
+  - name: mysql-rpm
+    type: URL
+    url: https://dev.mysql.com/get/mysql-shell-${MYSQL_RPM_VERSION}.el7.x86_64.rpm
+    location: ${OCI_PRIMARY_SOURCE_DIR}/DB-Setup/mysql.rpm
+
+steps:
+  - type: Command
+    timeoutInSeconds: 6000
+    name: DB Setup
+    command: |
+      cd ${OCI_PRIMARY_SOURCE_DIR}/DB-Setup
+      rpm -i mysql.rpm
+      mysqlsh --sql --host=${DB_SERVER} --port=${DB_PORT} --user=${DB_USERNAME} --password=${DB_PASSWORD_VALUE} <setup.sql
+      echo "show databases;" |mysqlsh --sql --host=${DB_SERVER} --port=${DB_PORT} --user=${DB_USERNAME} --password=${DB_PASSWORD_VALUE}
+    onFailure:
+      - type: Command
+        command: |
+          echo "Handling Failure"
+          echo "Failure successfully handled"
+        timeoutInSeconds: 40
+        runAs: root
+
