@@ -45,4 +45,4 @@ locals{
   image_tag = oci_devops_build_run.adminapi_authorizer_buildrun.build_outputs[0].exported_variables[0].items[0].value
 }
 
-resource "oci_functions_function" "test_function" {}
+

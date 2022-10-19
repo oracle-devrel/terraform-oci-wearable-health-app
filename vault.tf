@@ -67,9 +67,9 @@ resource oci_vault_secret "db_source_env_user" {
   key_id = oci_kms_key.vault_master_key.id
   secret_content {
     content_type = "BASE64"
-    content = base64encode(var.vault_app_env_user)
+    content = base64encode(var.mysql_db_system_admin_username)
   }
-  secret_name    = "data_source_env_setUser"
+  secret_name    = "data_source_env_username"
   vault_id       = oci_kms_vault.vault.id
 }
 
